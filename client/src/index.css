@@ -1,0 +1,62 @@
+@import "tailwindcss";
+
+@plugin "tailwindcss-animate";
+
+/* Define the Luxury Theme Variables */
+@theme {
+  /* Colors */
+  --color-charcoal: #0F0F0F;
+  --color-surface: #1A1714;
+  
+  --color-gold-400: #F5C26B;
+  --color-gold-500: #D9A54C;
+  
+  --color-orange-500: #F97316;
+  
+  --color-text-primary: #F5F5F5;
+  --color-text-secondary: #A3A3A3;
+
+  /* Fonts */
+  --font-sans: "Inter", sans-serif;
+  --font-display: "Poppins", sans-serif;
+
+  /* Shadows */
+  --shadow-gold: 0 4px 20px -5px rgba(245, 194, 107, 0.3);
+  --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  
+  /* Gradients */
+  --image-luxury: linear-gradient(180deg, #1A1714 0%, #0F0F0F 100%);
+}
+
+/* Custom Base Styles */
+@layer base {
+  body {
+    background-color: var(--color-charcoal);
+    color: var(--color-text-primary);
+    font-family: var(--font-sans);
+    antialiased: true;
+  }
+
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--color-charcoal);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #333;
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-gold-400);
+  }
+}
+
+/* Utilities */
+@utility glass-panel {
+  background-color: color-mix(in srgb, var(--color-surface), transparent 40%);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: var(--shadow-glass);
+}
