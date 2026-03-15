@@ -8,7 +8,6 @@ const api = axios.create({
   },
 });
 
-// Request Interceptor: Attach Token
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
@@ -20,12 +19,10 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response Interceptor: Handle Global Errors
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response && error.response.status === 401) {
-      // Auto logout on unauthorized
       localStorage.removeItem("token");
       localStorage.removeItem("user");
       window.location.href = "/login";

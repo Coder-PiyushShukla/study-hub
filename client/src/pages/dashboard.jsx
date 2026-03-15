@@ -2,11 +2,14 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
   FiDownload, FiUploadCloud, FiStar, FiClock, 
-  FiTrendingUp, FiFileText, FiBookOpen, FiAward, FiChevronRight 
+  FiTrendingUp, FiBookOpen, FiAward, FiChevronRight 
 } from 'react-icons/fi';
 import { 
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer 
 } from 'recharts';
+import ResumeATS from '../components/ResumeATS';
+import UploadModal from '../components/uploadModal';
+import { useAuth } from '../hooks/useAuth';
 
 const PERFORMANCE_DATA = [
   { month: 'Jan', score: 45 },
@@ -49,14 +52,8 @@ const StatCard = ({ icon: Icon, title, value, trend, delay }) => (
 );
 
 const Dashboard = () => {
-  const [dragActive, setDragActive] = useState(false);
-
-  const handleDrag = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") setDragActive(true);
-    else if (e.type === "dragleave") setDragActive(false);
-  };
+  const { user } = useAuth();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-charcoal pt-32 pb-20 px-6 font-sans">
@@ -69,13 +66,16 @@ const Dashboard = () => {
         >
           <div>
             <h1 className="text-4xl font-bold font-display text-text-primary tracking-tight">
-              Welcome back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-gold-400 to-orange-500">Piyush</span>
+              Welcome back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-gold-400 to-orange-500">{user?.name?.split(' ')[0] || 'Piyush'}</span>
             </h1>
             <p className="text-text-secondary mt-2 text-lg font-light">
               Here is what's happening with your career prep today.
             </p>
           </div>
-          <button className="px-6 py-3 bg-gradient-to-r from-gold-400 to-orange-500 text-charcoal font-bold rounded-xl shadow-gold hover:scale-105 transition-all flex items-center gap-2">
+          <button 
+            onClick={() => setIsModalOpen(true)}
+            className="px-6 py-3 bg-gradient-to-r from-gold-400 to-orange-500 text-charcoal font-bold rounded-xl shadow-gold hover:scale-105 transition-all flex items-center gap-2"
+          >
             <FiUploadCloud size={18} /> Upload Resource
           </button>
         </motion.div>
@@ -129,27 +129,8 @@ const Dashboard = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
-            className="bg-surface border border-white/5 rounded-3xl p-8 shadow-glass flex flex-col"
           >
-            <h2 className="text-xl font-bold font-display text-text-primary mb-2">Resume ATS Check</h2>
-            <p className="text-sm text-text-secondary mb-6">Upload your latest resume for AI scoring.</p>
-            
-            <div 
-              onDragEnter={handleDrag}
-              onDragLeave={handleDrag}
-              onDragOver={handleDrag}
-              onDrop={handleDrag}
-              className={`flex-1 border-2 border-dashed rounded-2xl flex flex-col items-center justify-center p-6 text-center transition-all duration-300 ${dragActive ? 'border-gold-400 bg-gold-400/5' : 'border-white/10 hover:border-gold-400/50 bg-charcoal/50'}`}
-            >
-              <div className="w-16 h-16 rounded-full bg-surface border border-white/5 flex items-center justify-center text-gold-400 mb-4 shadow-lg">
-                <FiFileText size={28} />
-              </div>
-              <p className="text-text-primary font-bold mb-1">Drag & drop your PDF</p>
-              <p className="text-text-secondary text-xs mb-6">or click to browse files</p>
-              <button className="px-6 py-2.5 bg-surface border border-white/10 rounded-xl text-sm font-bold text-text-primary hover:bg-white/5 transition-colors shadow-sm">
-                Select File
-              </button>
-            </div>
+            <ResumeATS />
           </motion.div>
         </div>
 
@@ -190,6 +171,7 @@ const Dashboard = () => {
         </motion.div>
 
       </div>
+      <UploadModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </div>
   );
 };

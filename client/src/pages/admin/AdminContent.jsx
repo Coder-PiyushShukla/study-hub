@@ -11,9 +11,12 @@ const AdminContent = () => {
   const fetchPendingContent = async () => {
     try {
       const { data } = await api.get('/admin/pending');
-      setPendingItems(data);
+      setPendingItems({
+        notes: data.notes || [],
+        experiences: data.experiences || []
+      });
     } catch (error) {
-      toast.error('Failed to load pending content');
+      toast.error('Failed to load pending content.');
     } finally {
       setIsLoading(false);
     }
@@ -34,7 +37,21 @@ const AdminContent = () => {
   };
 
   const handleReject = async (type, id) => {
-    toast.error('Rejection logic requires a delete endpoint. Implement soon!');
+    try {
+      await api.delete(`/admin/${type}/${id}/reject`);
+      toast.success(`${type === 'notes' ? 'Note' : 'Experience'} rejected and removed.`);
+      fetchPendingContent();
+    } catch (error) {
+      toast.error('Failed to reject content');
+    }
+  };
+
+  const getSafeUrl = (url) => {
+    if (!url) return '#';
+    if (url.startsWith('http')) return url;
+    const baseUrl = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace('/api', '') : 'http://localhost:5000';
+    const cleanUrl = url.replace(/\\/g, '/').replace(/^\//, '');
+    return `${baseUrl}/${cleanUrl}`;
   };
 
   return (
@@ -88,7 +105,7 @@ const AdminContent = () => {
 
                   <div className="flex items-center gap-3 self-end md:self-auto">
                     <a 
-                      href={note.fileUrl} 
+                      href={getSafeUrl(note.fileUrl)} 
                       target="_blank" 
                       rel="noreferrer"
                       className="px-4 py-2 bg-surface border border-white/10 rounded-lg text-sm text-text-secondary hover:text-gold-400 hover:border-gold-400/30 transition-colors flex items-center gap-2 font-medium shadow-sm"

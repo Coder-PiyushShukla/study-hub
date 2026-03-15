@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, useScroll, useTransform, useSpring, useInView } from 'framer-motion';
+import { motion, useScroll, useTransform, useInView } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { 
   FiArrowRight, FiCheckCircle, FiBookOpen, FiBriefcase, FiTrendingUp, 
-  FiUsers, FiStar, FiDownload, FiPlayCircle, FiGithub, FiTwitter, FiLinkedin 
+  FiUsers, FiDownload, FiCompass, FiGithub, FiTwitter, FiLinkedin 
 } from 'react-icons/fi';
 
 const Counter = ({ value, label }) => {
@@ -54,7 +54,13 @@ const GlassCard = ({ children, className }) => (
 const HeroSection = () => {
   const { scrollY } = useScroll();
   const y1 = useTransform(scrollY, [0, 500], [0, 200]);
-  const y2 = useTransform(scrollY, [0, 500], [0, -150]);
+
+  const scrollToFeatures = () => {
+    const featuresSection = document.getElementById('features-section');
+    if (featuresSection) {
+      featuresSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
@@ -98,13 +104,16 @@ const HeroSection = () => {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
             <Link to="/register" className="group relative px-8 py-4 bg-gradient-to-r from-gold-400 to-orange-500 rounded-xl font-bold text-charcoal overflow-hidden shadow-gold transition-all hover:scale-105">
-              <span className="relative z-10 flex items-center gap-2">
+              <span className="relative z-10 flex items-center justify-center gap-2">
                 Get Started Free <FiArrowRight className="group-hover:translate-x-1 transition-transform" />
               </span>
             </Link>
             
-            <button className="px-8 py-4 rounded-xl font-bold text-text-primary border border-white/10 hover:bg-white/5 transition-all flex items-center justify-center gap-2 backdrop-blur-sm">
-              <FiPlayCircle className="text-xl text-gold-400" /> Watch Demo
+            <button 
+              onClick={scrollToFeatures}
+              className="px-8 py-4 rounded-xl font-bold text-text-primary border border-white/10 hover:bg-white/5 transition-all flex items-center justify-center gap-2 backdrop-blur-sm group"
+            >
+              <FiCompass className="text-xl text-gold-400 group-hover:rotate-45 transition-transform duration-500" /> Explore Hub
             </button>
           </div>
 
@@ -173,7 +182,7 @@ const FeaturesSection = () => {
   ];
 
   return (
-    <section className="py-32 bg-charcoal relative border-t border-white/5">
+    <section id="features-section" className="py-32 bg-charcoal relative border-t border-white/5">
       <div className="container mx-auto px-6">
         <div className="text-center mb-24">
           <h2 className="text-3xl md:text-5xl font-bold font-display text-text-primary mb-6">Built for <span className="text-gold-400">Excellence</span></h2>

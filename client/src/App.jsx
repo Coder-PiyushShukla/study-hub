@@ -1,4 +1,4 @@
-import React, { useState, lazy, Suspense } from "react";
+import React, { useState, useEffect, lazy, Suspense } from "react";
 import { BrowserRouter as Router, Routes, Route, useLocation, Outlet } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import { Toaster } from 'react-hot-toast';
@@ -7,14 +7,17 @@ import Navbar from "./components/common/navbar";
 import BookIntro from "./components/common/BookIntro";
 import Loader from "./components/common/loader";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
+import AdminRoute from "./components/auth/adminRoute";
 
 import AdminLayout from "./layouts/AdminLayout";
 
 const LandingPage = lazy(() => import("./pages/home"));
-const Dashboard = lazy(() => import("./pages/dashboard")); 
+const About = lazy(() => import("./pages/about"));
+const Dashboard = lazy(() => import("./pages/dashboard"));
 const NotesLibrary = lazy(() => import("./pages/NotesLibrary"));
 const ExperienceHub = lazy(() => import("./pages/ExperienceHub"));
 const CompanyPrep = lazy(() => import("./pages/companyPrep"));
+const AIAssistant = lazy(() => import("./pages/AIassistant"));
 
 const Login = lazy(() => import("./pages/login"));
 const Register = lazy(() => import("./pages/Register"));
@@ -29,7 +32,7 @@ const AdminSettings = lazy(() => import("./pages/admin/AdminSettings"));
 function ScrollToTop() {
   const { pathname } = useLocation();
 
-  React.useEffect(() => {
+  useEffect(() => {
     window.scrollTo(0, 0);
   }, [pathname]);
 
@@ -54,18 +57,26 @@ const PublicLayout = () => {
 };
 
 function App() {
-  const [showIntro, setShowIntro] = useState(true);
+  const [showIntro, setShowIntro] = useState(false);
+
+  useEffect(() => {
+    const hasSeenIntro = sessionStorage.getItem('hasSeenIntro');
+    if (!hasSeenIntro) {
+      setShowIntro(true);
+    }
+  }, []);
 
   const handleIntroComplete = () => {
+    sessionStorage.setItem('hasSeenIntro', 'true');
     setShowIntro(false);
   };
 
   return (
     <Router>
       <ScrollToTop />
-      
-      <Toaster 
-        position="top-right" 
+
+      <Toaster
+        position="top-right"
         toastOptions={{
           style: {
             background: '#1A1714',
@@ -89,8 +100,8 @@ function App() {
             <Routes>
               <Route element={<PublicLayout />}>
                 <Route path="/" element={<LandingPage />} />
-                
-                {/* Protected Public Routes */}
+                <Route path="/about" element={<About />} />
+
                 <Route path="/notes" element={
                   <ProtectedRoute>
                     <NotesLibrary />
@@ -111,35 +122,38 @@ function App() {
                     <Dashboard />
                   </ProtectedRoute>
                 } />
+                <Route path="/ai-mentor" element={
+                  <ProtectedRoute>
+                    <AIAssistant />
+                  </ProtectedRoute>
+                } />
               </Route>
 
-              {/* Auth Routes */}
-              <Route 
-                path="/login" 
+              <Route
+                path="/login"
                 element={
                   <Suspense fallback={<div className="h-screen flex items-center justify-center bg-charcoal"><Loader /></div>}>
                     <Login />
                   </Suspense>
-                } 
+                }
               />
-              <Route 
-                path="/register" 
+              <Route
+                path="/register"
                 element={
                   <Suspense fallback={<div className="h-screen flex items-center justify-center bg-charcoal"><Loader /></div>}>
                     <Register />
                   </Suspense>
-                } 
+                }
               />
 
-              {/* Protected Admin Routes */}
-              <Route 
-                path="/admin" 
+              <Route
+                path="/admin"
                 element={
-                  <ProtectedRoute>
+                  <AdminRoute>
                     <Suspense fallback={<div className="h-screen bg-charcoal flex items-center justify-center"><Loader /></div>}>
                       <AdminLayout />
                     </Suspense>
-                  </ProtectedRoute>
+                  </AdminRoute>
                 }
               >
                 <Route index element={<AdminDashboard />} />
@@ -150,7 +164,6 @@ function App() {
                 <Route path="settings" element={<AdminSettings />} />
               </Route>
 
-              {/* 404 Route */}
               <Route
                 path="*"
                 element={

@@ -1,17 +1,18 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiMenu, FiX, FiSearch, FiBell, FiUser, FiLogOut, FiLayout } from 'react-icons/fi';
-import { AuthContext } from '../../context/AuthContext';
+import { FiMenu, FiX, FiSearch, FiBell, FiUser, FiLogOut, FiLayout, FiShield } from 'react-icons/fi';
+import { useAuth } from '../../hooks/useAuth';
 import toast from 'react-hot-toast';
 
 const Navbar = () => {
-  const { user, logout } = useContext(AuthContext);
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
@@ -24,16 +25,33 @@ const Navbar = () => {
     logout();
     setMobileMenuOpen(false);
     toast.success("Successfully logged out");
-    navigate("/");
+    navigate("/login");
   };
 
-  const navLinks = [
+  const publicLinks = [
     { name: 'Home', path: '/' },
+    { name: 'About', path: '/about' },
+  ];
+
+  const studentLinks = [
+    { name: 'Dashboard', path: '/dashboard' },
     { name: 'Notes', path: '/notes' },
     { name: 'Experience', path: '/experience' },
     { name: 'Placements', path: '/placements' },
+    { name: 'AI Mentor', path: '/ai-mentor' },
   ];
 
+  const adminLinks = [
+    { name: 'Admin Portal', path: '/admin' },
+  ];
+
+  const getLinks = () => {
+    if (!user) return publicLinks;
+    if (user.role === 'admin') return adminLinks;
+    return studentLinks;
+  };
+
+  const currentLinks = getLinks();
   const isActive = (path) => location.pathname === path;
 
   return (
@@ -61,7 +79,7 @@ const Navbar = () => {
             </Link>
 
             <div className="hidden md:flex items-center gap-8 bg-surface/80 px-8 py-2 rounded-full border border-white/5 backdrop-blur-sm shadow-glass">
-              {navLinks.map((link) => (
+              {currentLinks.map((link) => (
                 <Link 
                   key={link.name} 
                   to={link.path}
@@ -96,19 +114,62 @@ const Navbar = () => {
 
               {user ? (
                 <div className="flex items-center gap-4 relative">
-                  <button className="relative p-2 text-text-secondary hover:text-text-primary transition-colors">
-                    <FiBell size={20} />
-                    <span className="absolute top-2 right-2 w-2 h-2 bg-orange-500 rounded-full animate-pulse"></span>
-                  </button>
+                  <div className="relative">
+                    <button 
+                      onClick={() => {
+                        setShowNotifications(!showNotifications);
+                        setProfileOpen(false);
+                      }}
+                      className="relative p-2 text-text-secondary hover:text-text-primary transition-colors"
+                    >
+                      <FiBell size={20} />
+                      <span className="absolute top-2 right-2 w-2 h-2 bg-orange-500 rounded-full animate-pulse"></span>
+                    </button>
+
+                    <AnimatePresence>
+                      {showNotifications && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                          transition={{ duration: 0.2 }}
+                          className="absolute right-0 mt-2 w-80 bg-surface border border-white/10 rounded-2xl shadow-glass overflow-hidden z-50"
+                        >
+                          <div className="p-4 border-b border-white/5 bg-charcoal/50">
+                            <h3 className="font-bold text-text-primary">Notifications</h3>
+                          </div>
+                          <div className="max-h-64 overflow-y-auto">
+                            <div className="p-4 border-b border-white/5 hover:bg-white/5 transition-colors cursor-pointer">
+                              <p className="text-sm text-gold-400 font-medium">Resource Approved</p>
+                              <p className="text-xs text-text-secondary mt-1">Your 'Operating Systems - Deadlocks' note is now live on the platform.</p>
+                            </div>
+                            <div className="p-4 border-b border-white/5 hover:bg-white/5 transition-colors cursor-pointer">
+                              <p className="text-sm text-text-primary font-medium">New Kit Available</p>
+                              <p className="text-xs text-text-secondary mt-1">The Microsoft interview preparation kit has been updated with new questions.</p>
+                            </div>
+                          </div>
+                          <div 
+                            onClick={() => setShowNotifications(false)}
+                            className="p-3 text-center border-t border-white/5 bg-charcoal/50 text-text-secondary hover:text-gold-400 cursor-pointer text-sm font-medium transition-colors"
+                          >
+                            Mark all as read
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
                   
                   <div 
                     className="relative"
-                    onMouseEnter={() => setProfileOpen(true)}
+                    onMouseEnter={() => {
+                      setProfileOpen(true);
+                      setShowNotifications(false);
+                    }}
                     onMouseLeave={() => setProfileOpen(false)}
                   >
                     <div className="w-9 h-9 rounded-full bg-gradient-to-r from-gold-400 to-orange-500 p-[2px] cursor-pointer hover:scale-105 transition-transform">
                       <img 
-                        src={`https://ui-avatars.com/api/?name=${user.name || 'User'}&background=1A1714&color=F5C26B`} 
+                        src={`https://ui-avatars.com/api/?name=${user.name?.split(' ').join('+') || 'User'}&background=1A1714&color=F5C26B`} 
                         alt="Profile" 
                         className="rounded-full w-full h-full border-2 border-charcoal object-cover" 
                       />
@@ -124,17 +185,19 @@ const Navbar = () => {
                           className="absolute right-0 mt-2 w-56 bg-surface border border-white/10 rounded-2xl shadow-glass overflow-hidden z-50 py-2"
                         >
                           <div className="px-4 py-3 border-b border-white/5 mb-2 bg-charcoal/50">
-                            <p className="text-sm text-text-primary font-bold font-display truncate">{user.name || 'Student User'}</p>
-                            <p className="text-xs text-text-secondary truncate">{user.email || 'student@smartportal.com'}</p>
+                            <p className="text-sm text-text-primary font-bold font-display truncate">{user.name}</p>
+                            <p className="text-xs text-text-secondary truncate">{user.email}</p>
                           </div>
                           
-                          <Link to="/dashboard" className="flex items-center gap-3 px-4 py-2.5 text-sm text-text-secondary hover:text-gold-400 hover:bg-white/5 transition-colors">
-                            <FiLayout size={16} /> My Dashboard
-                          </Link>
+                          {user.role !== 'admin' && (
+                            <Link to="/dashboard" className="flex items-center gap-3 px-4 py-2.5 text-sm text-text-secondary hover:text-gold-400 hover:bg-white/5 transition-colors">
+                              <FiLayout size={16} /> My Dashboard
+                            </Link>
+                          )}
                           
                           {user.role === 'admin' && (
                             <Link to="/admin" className="flex items-center gap-3 px-4 py-2.5 text-sm text-text-secondary hover:text-gold-400 hover:bg-white/5 transition-colors">
-                              <FiUser size={16} /> Admin Panel
+                              <FiShield size={16} /> Admin Suite
                             </Link>
                           )}
                           
@@ -199,20 +262,22 @@ const Navbar = () => {
                 <div className="flex items-center gap-4 mb-8 p-4 bg-surface rounded-2xl border border-white/5">
                   <div className="w-12 h-12 rounded-full bg-gradient-to-r from-gold-400 to-orange-500 p-[2px]">
                     <img 
-                      src={`https://ui-avatars.com/api/?name=${user.name || 'User'}&background=1A1714&color=F5C26B`} 
+                      src={`https://ui-avatars.com/api/?name=${user.name?.split(' ').join('+') || 'User'}&background=1A1714&color=F5C26B`} 
                       alt="Profile" 
-                      className="rounded-full w-full h-full border-2 border-charcoal" 
+                      className="rounded-full w-full h-full border-2 border-charcoal object-cover" 
                     />
                   </div>
                   <div>
-                    <p className="text-text-primary font-bold">{user.name || 'Student User'}</p>
-                    <Link to="/dashboard" onClick={() => setMobileMenuOpen(false)} className="text-gold-400 text-sm font-medium">View Dashboard</Link>
+                    <p className="text-text-primary font-bold">{user.name}</p>
+                    <Link to={user.role === 'admin' ? '/admin' : '/dashboard'} onClick={() => setMobileMenuOpen(false)} className="text-gold-400 text-sm font-medium">
+                      {user.role === 'admin' ? 'Admin Suite' : 'View Dashboard'}
+                    </Link>
                   </div>
                 </div>
               )}
 
               <div className="flex flex-col gap-6">
-                {navLinks.map((link, idx) => (
+                {currentLinks.map((link, idx) => (
                   <motion.div
                     key={link.name}
                     initial={{ opacity: 0, x: 20 }}

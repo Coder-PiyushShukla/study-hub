@@ -1,60 +1,124 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiSearch, FiFilter, FiDownload, FiFileText, FiStar, FiFolder } from 'react-icons/fi';
+import { FiSearch, FiDownload, FiFileText, FiStar, FiFolder } from 'react-icons/fi';
+import api from '../services/Api';
+import toast from 'react-hot-toast';
 
-const MOCK_NOTES = [
-  { id: 1, title: 'Data Structures - Trees & Graphs', subject: 'DSA', semester: 'Sem 3', author: 'Rahul K.', downloads: 1240, rating: 4.8, type: 'pdf' },
-  { id: 2, title: 'Operating System Internals', subject: 'OS', semester: 'Sem 4', author: 'Anjali S.', downloads: 850, rating: 4.5, type: 'pdf' },
-  { id: 3, title: 'React.js Complete Guide', subject: 'Web Dev', semester: 'Sem 5', author: 'Piyush S.', downloads: 2100, rating: 4.9, type: 'pdf' },
-  { id: 4, title: 'Database Normalization Notes', subject: 'DBMS', semester: 'Sem 4', author: 'Faculty', downloads: 600, rating: 4.2, type: 'pdf' },
-  { id: 5, title: 'Computer Networks Unit 1-3', subject: 'CN', semester: 'Sem 5', author: 'Rohan M.', downloads: 920, rating: 4.6, type: 'pdf' },
-  { id: 6, title: 'Engineering Maths III Formulas', subject: 'Maths', semester: 'Sem 3', author: 'Topper X', downloads: 3000, rating: 4.7, type: 'pdf' },
-];
+const SEMESTERS = ['All', '1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th'];
 
-const SEMESTERS = ['All', 'Sem 1', 'Sem 2', 'Sem 3', 'Sem 4', 'Sem 5', 'Sem 6', 'Sem 7', 'Sem 8'];
-
-const NoteCard = ({ note }) => (
-  <motion.div
-    layout
-    initial={{ opacity: 0, scale: 0.95 }}
-    animate={{ opacity: 1, scale: 1 }}
-    exit={{ opacity: 0, scale: 0.95 }}
-    whileHover={{ y: -5 }}
-    className="group relative bg-surface border border-white/5 rounded-3xl p-6 hover:border-gold-400/30 transition-all duration-300 shadow-glass"
-  >
-    <div className="absolute inset-0 bg-gradient-to-br from-gold-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-3xl" />
+const NoteCard = ({ note }) => {
+  const handleDownload = async () => {
+    if (!note.fileUrl) {
+      return toast.error("File URL not found for this resource.");
+    }
     
-    <div className="relative z-10 flex flex-col h-full">
-      <div className="flex justify-between items-start mb-6">
-        <div className="p-4 bg-charcoal rounded-2xl text-gold-400 border border-white/5 group-hover:bg-gold-400 group-hover:text-charcoal transition-colors shadow-lg">
-          <FiFileText size={24} />
+    let fileUrl = note.fileUrl;
+    if (!fileUrl.startsWith('http')) {
+      const baseUrl = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace('/api', '') : 'http://localhost:5000';
+      fileUrl = `${baseUrl}/${fileUrl.replace(/\\/g, '/').replace(/^\//, '')}`;
+    }
+
+    const toastId = toast.loading(`Downloading ${note.title}...`);
+
+    try {
+      if (fileUrl.includes('cloudinary.com')) {
+        const parts = fileUrl.split('/upload/');
+        if (parts.length === 2) {
+          fileUrl = `${parts[0]}/upload/fl_attachment/${parts[1]}`;
+        }
+      }
+
+      const response = await fetch(fileUrl);
+      if (!response.ok) throw new Error('Network response was not ok');
+      
+      const blob = await response.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+      
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      
+      const safeTitle = note.title ? note.title.replace(/[^a-zA-Z0-9 -]/g, "").trim() : "smartportal_document";
+      link.download = `${safeTitle}.pdf`;
+      
+      document.body.appendChild(link);
+      link.click();
+      
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(blobUrl);
+      
+      toast.success("Download complete!", { id: toastId });
+    } catch (error) {
+      window.open(fileUrl, '_blank');
+      toast.dismiss(toastId);
+    }
+  };
+
+  return (
+    <motion.div
+      layout
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.95 }}
+      whileHover={{ y: -5 }}
+      className="group relative bg-surface border border-white/5 rounded-3xl p-6 hover:border-gold-400/30 transition-all duration-300 shadow-glass"
+    >
+      <div className="absolute inset-0 bg-gradient-to-br from-gold-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-3xl" />
+      
+      <div className="relative z-10 flex flex-col h-full">
+        <div className="flex justify-between items-start mb-6">
+          <div className="p-4 bg-charcoal rounded-2xl text-gold-400 border border-white/5 group-hover:bg-gold-400 group-hover:text-charcoal transition-colors shadow-lg">
+            <FiFileText size={24} />
+          </div>
+          <div className="flex items-center gap-1 text-gold-400 text-xs font-bold bg-gold-400/10 border border-gold-400/20 px-3 py-1.5 rounded-full">
+            <FiStar fill="currentColor" /> {note.rating || '4.5'}
+          </div>
         </div>
-        <div className="flex items-center gap-1 text-gold-400 text-xs font-bold bg-gold-400/10 border border-gold-400/20 px-3 py-1.5 rounded-full">
-          <FiStar fill="currentColor" /> {note.rating}
+
+        <h3 className="text-lg font-bold font-display text-text-primary mb-2 line-clamp-2">{note.title}</h3>
+        <p className="text-sm text-text-secondary mb-6">{note.category} • Sem {note.semester}</p>
+
+        <div className="mt-auto flex items-center justify-between pt-5 border-t border-white/5">
+          <span className="text-xs text-text-secondary font-medium truncate max-w-[120px]">
+            By {note.uploadedBy?.name || 'Anonymous'}
+          </span>
+          <button 
+            onClick={handleDownload}
+            className="flex items-center gap-2 text-sm font-bold text-orange-400 bg-orange-500/10 px-4 py-2 rounded-xl hover:bg-orange-500 hover:text-charcoal transition-all shadow-sm z-20 cursor-pointer"
+          >
+            <FiDownload /> {note.downloads || 0}
+          </button>
         </div>
       </div>
-
-      <h3 className="text-lg font-bold font-display text-text-primary mb-2 line-clamp-2">{note.title}</h3>
-      <p className="text-sm text-text-secondary mb-6">{note.subject} • {note.semester}</p>
-
-      <div className="mt-auto flex items-center justify-between pt-5 border-t border-white/5">
-        <span className="text-xs text-text-secondary font-medium">By {note.author}</span>
-        <button className="flex items-center gap-2 text-sm font-bold text-orange-400 bg-orange-500/10 px-3 py-1.5 rounded-lg hover:bg-orange-500/20 transition-colors">
-          <FiDownload /> {note.downloads}
-        </button>
-      </div>
-    </div>
-  </motion.div>
-);
+    </motion.div>
+  );
+};
 
 const NotesLibrary = () => {
+  const [notes, setNotes] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [activeSem, setActiveSem] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
 
-  const filteredNotes = MOCK_NOTES.filter(note => {
+  useEffect(() => {
+    const fetchNotes = async () => {
+      try {
+        const response = await api.get('/notes');
+        setNotes(response.data);
+      } catch (error) {
+        toast.error("Failed to load resources. Please try again later.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchNotes();
+  }, []);
+
+  const filteredNotes = notes.filter(note => {
     const matchesSem = activeSem === 'All' || note.semester === activeSem;
-    const matchesSearch = note.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          note.subject.toLowerCase().includes(searchQuery.toLowerCase());
+    const searchLower = searchQuery.toLowerCase();
+    const matchesSearch = 
+      (note.title && note.title.toLowerCase().includes(searchLower)) || 
+      (note.category && note.category.toLowerCase().includes(searchLower));
     return matchesSem && matchesSearch;
   });
 
@@ -91,27 +155,38 @@ const NotesLibrary = () => {
                   : 'bg-surface text-text-secondary border border-white/5 hover:bg-white/5 hover:text-text-primary'
               }`}
             >
-              {sem}
+              {sem === 'All' ? 'All' : `Sem ${sem}`}
             </button>
           ))}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          <AnimatePresence>
-            {filteredNotes.map((note) => (
-              <NoteCard key={note.id} note={note} />
-            ))}
-          </AnimatePresence>
-        </div>
-
-        {filteredNotes.length === 0 && (
-          <div className="text-center py-32 bg-surface/50 rounded-3xl border border-white/5 backdrop-blur-sm mt-8">
-            <div className="w-20 h-20 bg-charcoal rounded-2xl flex items-center justify-center mx-auto mb-6 text-gold-400/50 border border-white/5 shadow-lg">
-              <FiFolder size={32} />
-            </div>
-            <h3 className="text-xl font-bold font-display text-text-primary mb-2">No notes found</h3>
-            <p className="text-text-secondary">Try adjusting your filters or search query.</p>
+        {isLoading ? (
+          <div className="flex items-center justify-center py-32">
+             <div className="w-12 h-12 border-4 border-gold-400/30 border-t-gold-400 rounded-full animate-spin" />
           </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              <AnimatePresence>
+                {filteredNotes.map((note) => (
+                  <NoteCard key={note._id} note={note} />
+                ))}
+              </AnimatePresence>
+            </div>
+
+            {filteredNotes.length === 0 && (
+              <motion.div 
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                className="text-center py-32 bg-surface/50 rounded-3xl border border-white/5 backdrop-blur-sm mt-8"
+              >
+                <div className="w-20 h-20 bg-charcoal rounded-2xl flex items-center justify-center mx-auto mb-6 text-gold-400/50 border border-white/5 shadow-lg">
+                  <FiFolder size={32} />
+                </div>
+                <h3 className="text-xl font-bold font-display text-text-primary mb-2">No notes found</h3>
+                <p className="text-text-secondary">Try adjusting your filters or wait for admins to approve new uploads.</p>
+              </motion.div>
+            )}
+          </>
         )}
       </div>
     </div>

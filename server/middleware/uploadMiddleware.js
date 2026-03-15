@@ -4,10 +4,19 @@ const cloudinary = require('../config/cloudinary');
 
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
-  params: {
-    folder: 'smartportal_notes',
-    allowed_formats: ['pdf', 'jpg', 'jpeg', 'png'],
-    resource_type: 'auto'
+  params: async (req, file) => {
+    if (file.mimetype === 'application/pdf') {
+      return {
+        folder: 'smartportal_notes',
+        resource_type: 'raw'
+      };
+    }
+    
+    return {
+      folder: 'smartportal_notes',
+      allowed_formats: ['jpg', 'jpeg', 'png'],
+      resource_type: 'auto'
+    };
   },
 });
 
