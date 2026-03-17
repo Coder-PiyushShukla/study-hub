@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiSend, FiPaperclip, FiX, FiCpu, FiUser, FiCode, FiFileText, FiTarget, FiZap, FiInfo } from 'react-icons/fi';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import api from '../services/Api';
 import toast from 'react-hot-toast';
 
@@ -144,12 +146,40 @@ const AIAssistant = () => {
                           <FiPaperclip size={14} /> Attached PDF: {msg.file}
                         </div>
                       )}
-                      <div className={`px-5 sm:px-6 py-4 rounded-2xl text-[15px] leading-relaxed whitespace-pre-wrap ${
+                      <div className={`px-5 sm:px-6 py-4 rounded-2xl text-[15px] leading-relaxed ${
                         msg.role === 'user' 
-                          ? 'bg-[#1A1A1A] border border-white/5 text-gray-100 rounded-tr-sm' 
+                          ? 'bg-[#1A1A1A] border border-white/5 text-gray-100 rounded-tr-sm whitespace-pre-wrap' 
                           : 'bg-transparent text-gray-200'
                       }`}>
-                        {msg.content}
+                        {msg.role === 'user' ? (
+                          msg.content
+                        ) : (
+                          <ReactMarkdown 
+                            remarkPlugins={[remarkGfm]}
+                            components={{
+                              h1: ({node, ...props}) => <h1 className="text-2xl font-bold text-gold-400 mt-6 mb-4" {...props} />,
+                              h2: ({node, ...props}) => <h2 className="text-xl font-bold text-gold-400 mt-5 mb-3" {...props} />,
+                              h3: ({node, ...props}) => <h3 className="text-lg font-bold text-orange-400 mt-4 mb-2" {...props} />,
+                              p: ({node, ...props}) => <p className="mb-4 text-gray-300" {...props} />,
+                              ul: ({node, ...props}) => <ul className="list-disc pl-6 mb-4 space-y-2 marker:text-gold-400" {...props} />,
+                              ol: ({node, ...props}) => <ol className="list-decimal pl-6 mb-4 space-y-2 marker:text-gold-400" {...props} />,
+                              li: ({node, ...props}) => <li className="text-gray-300" {...props} />,
+                              strong: ({node, ...props}) => <strong className="font-bold text-white" {...props} />,
+                              em: ({node, ...props}) => <em className="italic text-gray-400" {...props} />,
+                              table: ({node, ...props}) => <div className="overflow-x-auto mb-4"><table className="min-w-full border border-white/10 rounded-lg" {...props} /></div>,
+                              th: ({node, ...props}) => <th className="bg-white/5 border-b border-white/10 text-left py-3 px-4 text-gold-400 font-semibold" {...props} />,
+                              td: ({node, ...props}) => <td className="border-b border-white/5 py-3 px-4 text-gray-300" {...props} />,
+                              code: ({node, inline, ...props}) => 
+                                inline 
+                                  ? <code className="bg-[#1A1A1A] text-orange-400 px-1.5 py-0.5 rounded text-sm font-mono border border-white/10" {...props} />
+                                  : <div className="bg-[#121212] rounded-xl overflow-hidden border border-white/10 mb-4"><div className="flex items-center px-4 py-2 bg-white/5 border-b border-white/10"><div className="flex gap-1.5"><div className="w-2.5 h-2.5 rounded-full bg-red-500/80"></div><div className="w-2.5 h-2.5 rounded-full bg-yellow-500/80"></div><div className="w-2.5 h-2.5 rounded-full bg-green-500/80"></div></div></div><pre className="p-4 overflow-x-auto"><code className="text-sm font-mono text-gray-300" {...props} /></pre></div>,
+                              hr: ({node, ...props}) => <hr className="border-white/10 my-6" {...props} />,
+                              blockquote: ({node, ...props}) => <blockquote className="border-l-4 border-gold-400 pl-4 py-1 my-4 bg-white/5 rounded-r-lg text-gray-400 italic" {...props} />
+                            }}
+                          >
+                            {msg.content}
+                          </ReactMarkdown>
+                        )}
                       </div>
                     </div>
                   </motion.div>

@@ -30,7 +30,7 @@ router.post('/chat', upload.single('resume'), async (req, res) => {
       context = `\n\nUSER'S RESUME TEXT FOR ANALYSIS:\n${pdfData.text}`;
     }
 
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     const formattedHistory = history ? JSON.parse(history).map(msg => ({
       role: msg.role === 'ai' ? 'model' : 'user',
