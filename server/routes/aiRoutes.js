@@ -6,13 +6,17 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
 
+if (!process.env.GEMINI_API_KEY) {
+  console.error("CRITICAL ERROR: GEMINI_API_KEY is missing from .env file!");
+}
+
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 const SYSTEM_PROMPT = `You are the SmartPortal AI Placement Mentor, an elite career coach for engineering students. 
 Strict Rules:
-1. Provide actionable, highly structured advice (roadmaps, interview tips, resume reviews).
-2. If reviewing a resume, be brutally honest but constructive. Point out formatting, ATS compatibility, and impact-driven bullet points.
-3. NEVER hallucinate company data. If you don't know a company's specific process, give generalized top-tier MNC advice.
+1. Provide actionable, highly structured advice.
+2. If reviewing a resume, be brutally honest but constructive.
+3. NEVER hallucinate company data. Give generalized top-tier MNC advice if unsure.
 4. Keep responses formatted clearly using bullet points and short paragraphs.
 5. Do not write code for them unless explicitly asked for a specific algorithm approach.`;
 
@@ -47,7 +51,8 @@ router.post('/chat', upload.single('resume'), async (req, res) => {
 
     res.status(200).json({ response: responseText });
   } catch (error) {
-    res.status(500).json({ error: 'AI processing failed.' });
+    console.error("GEMINI AI ERROR:", error);
+    res.status(500).json({ error: 'AI processing failed.', details: error.message });
   }
 });
 

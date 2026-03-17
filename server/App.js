@@ -29,7 +29,7 @@ app.use('/api/experiences', require('./routes/experienceRoutes'));
 app.use('/api/companies', require('./routes/companyRoutes'));
 app.use('/api/resumes', require('./routes/resumeRoutes'));
 app.use('/api/tests', require('./routes/testRoutes'));
-
+app.use('/api/ai', require('./routes/aiRoutes'));
 app.use(notFound);
 app.use(errorHandler);
 
