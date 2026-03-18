@@ -1,6 +1,6 @@
 const User = require('../models/User');
 const Note = require('../models/Note');
-const Experience = require('../models/Experience');
+const Experience = require('../models/experience');
 
 const getDashboardStats = async (req, res) => {
   try {

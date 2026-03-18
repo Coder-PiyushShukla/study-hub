@@ -1,4 +1,4 @@
-const Experience = require('../models/Experience');
+const Experience = require('../models/experience');
 
 const createExperience = async (req, res) => {
   try {
