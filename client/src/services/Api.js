@@ -2,7 +2,7 @@ import axios from "axios";
 import { API_BASE_URL } from "../utils/constant";
 
 const api = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: 'https://study-hub-bowa.onrender.com',
   headers: {
     "Content-Type": "application/json",
   },
