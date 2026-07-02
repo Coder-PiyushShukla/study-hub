@@ -72,7 +72,7 @@ const About = () => {
             style={{ y: y2 }}
             className="absolute bottom-[10%] right-[10%] w-[600px] h-[600px] bg-orange-500/10 rounded-full blur-[150px] mix-blend-screen" 
           />
-          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.04]" />
+          <div className="absolute inset-0  opacity-[0.04]" />
         </div>
 
         <div className="max-w-5xl mx-auto text-center relative z-10">

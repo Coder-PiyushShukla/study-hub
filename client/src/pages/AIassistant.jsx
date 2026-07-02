@@ -83,7 +83,7 @@ const AIAssistant = () => {
       <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
         <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] bg-gold-400/5 rounded-full blur-[150px] mix-blend-screen" />
         <div className="absolute bottom-[-20%] right-[-10%] w-[600px] h-[600px] bg-orange-500/5 rounded-full blur-[150px] mix-blend-screen" />
-        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.02]" />
+        <div className="absolute inset-0  opacity-[0.02]" />
       </div>
 
       <div className="flex-1 overflow-y-auto scrollbar-hide relative z-10 scroll-smooth pb-40">

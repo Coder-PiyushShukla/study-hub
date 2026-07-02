@@ -141,7 +141,7 @@ const LoginPage = () => {
           transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
           className="absolute bottom-[10%] right-[20%] w-[400px] h-[400px] bg-orange-500/20 rounded-full blur-[120px] mix-blend-screen pointer-events-none" 
         />
-        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03] pointer-events-none" />
+        <div className="absolute inset-0  opacity-[0.03] pointer-events-none" />
 
         <div className="absolute inset-0 z-0 pointer-events-none opacity-20 flex items-center justify-center">
           <div className="w-full h-px bg-white/10 absolute top-1/2 -translate-y-1/2" />

@@ -67,7 +67,7 @@ const BookIntro = ({ onComplete }) => {
       animate={stage === 5 ? { opacity: 0, scale: 1.1 } : { opacity: 1, scale: 1 }}
       transition={{ duration: 1.5, ease: "easeInOut" }}
     >
-      <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.04]" />
+      <div className="absolute inset-0  opacity-[0.04]" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,#0F0F0F_100%)]" />
       <motion.div
         animate={stage === 5 ? { opacity: 0 } : { opacity: 1 }}
@@ -150,7 +150,7 @@ const BookIntro = ({ onComplete }) => {
               Hover to unlock
             </p>
             <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-black/80 via-black/20 to-transparent" />
-            <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03] mix-blend-overlay pointer-events-none" />
+            <div className="absolute inset-0  opacity-[0.03] mix-blend-overlay pointer-events-none" />
           </div>
           <div className="absolute inset-0 bg-[#110F0E] rounded-l-2xl border-r border-white/5 [transform:rotateY(180deg)] [backface-visibility:hidden] shadow-inner" />
         </motion.div>
