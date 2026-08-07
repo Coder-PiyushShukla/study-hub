@@ -2,8 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, useScroll, useTransform, useInView } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { 
-  FiBookOpen, FiBriefcase, FiTarget, FiAward, 
-  FiGithub, FiLinkedin, FiTwitter, FiArrowRight 
+  FiBookOpen, FiBriefcase, FiTarget, FiAward, FiArrowRight 
 } from 'react-icons/fi';
 
 const Counter = ({ value, label, suffix = '+' }) => {
@@ -53,12 +52,6 @@ const About = () => {
     { icon: FiAward, title: "Mock Tests", desc: "AI-driven mock assessments that simulate real technical rounds to build confidence." }
   ];
 
-  const team = [
-    { name: "Piyush Shukla", role: "Founder & CEO", image: "https://images.unsplash.com/photo-1556157382-97eda2d62296?auto=format&fit=crop&w=400&q=80" },
-    { name: "Adarsh Singh", role: "Chief Technology Officer", image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=400&q=80" },
-    { name: "Mayuresh", role: "Head of Product", image: "https://images.unsplash.com/photo-1542909168-82c3e7fdca5c?auto=format&fit=crop&w=400&q=80" }
-  ];
-
   return (
     <div className="bg-charcoal min-h-screen font-sans text-text-primary selection:bg-gold-400/30 overflow-hidden">
       
@@ -72,7 +65,7 @@ const About = () => {
             style={{ y: y2 }}
             className="absolute bottom-[10%] right-[10%] w-[600px] h-[600px] bg-orange-500/10 rounded-full blur-[150px] mix-blend-screen" 
           />
-          <div className="absolute inset-0  opacity-[0.04]" />
+          <div className="absolute inset-0 opacity-[0.04]" />
         </div>
 
         <div className="max-w-5xl mx-auto text-center relative z-10">
@@ -200,47 +193,27 @@ const About = () => {
         </div>
       </section>
 
-      <section className="relative py-32 bg-charcoal">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-20">
-            <motion.h2 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-4xl md:text-5xl font-bold font-display mb-4"
-            >
-              Meet the <span className="text-transparent bg-clip-text bg-gradient-to-r from-gold-400 to-orange-500">Founders</span>
-            </motion.h2>
-            <p className="text-text-secondary text-lg">The minds architecting the future of student success.</p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {team.map((member, idx) => (
-              <motion.div
-                key={idx}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: idx * 0.2 }}
-                className="bg-surface border border-white/5 rounded-[2rem] p-8 text-center group hover:border-gold-400/30 transition-all duration-500 shadow-glass"
-              >
-                <div className="w-32 h-32 mx-auto rounded-full p-1 bg-gradient-to-tr from-gold-400 to-orange-500 mb-6 group-hover:scale-105 transition-transform duration-500 shadow-[0_0_30px_-5px_rgba(245,194,107,0.4)]">
-                  <img 
-                    src={member.image} 
-                    alt={member.name}
-                    className="w-full h-full rounded-full object-cover border-4 border-charcoal"
-                  />
-                </div>
-                <h3 className="text-2xl font-bold text-text-primary mb-1">{member.name}</h3>
-                <p className="text-gold-400 font-medium mb-6 text-sm">{member.role}</p>
-                <div className="flex justify-center gap-4 text-text-secondary">
-                  <a href="#" className="hover:text-gold-400 transition-colors p-2 bg-charcoal rounded-full hover:bg-gold-400/10"><FiTwitter size={18} /></a>
-                  <a href="#" className="hover:text-gold-400 transition-colors p-2 bg-charcoal rounded-full hover:bg-gold-400/10"><FiLinkedin size={18} /></a>
-                  <a href="#" className="hover:text-gold-400 transition-colors p-2 bg-charcoal rounded-full hover:bg-gold-400/10"><FiGithub size={18} /></a>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+      <section className="relative py-32 bg-charcoal overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-gold-400/5 via-charcoal to-charcoal pointer-events-none" />
+        <div className="max-w-5xl mx-auto px-6 relative z-10 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+          >
+            <h2 className="text-4xl md:text-6xl font-light font-display leading-tight mb-8 text-text-primary">
+              Experience a <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-gold-400 to-orange-500">Unified</span> Learning Ecosystem
+            </h2>
+            <p className="text-xl md:text-2xl text-text-secondary font-light leading-relaxed max-w-4xl mx-auto mb-12">
+              Discover a seamless blend of collaborative intelligence and AI-driven preparation. SmartPortal transforms fragmented study materials into a streamlined, intuitive, and beautifully crafted platform designed exclusively for your success.
+            </p>
+            <div className="flex flex-wrap justify-center gap-4">
+              <span className="px-6 py-2 rounded-full border border-white/10 bg-surface/50 text-gold-400 text-sm tracking-wide">Intuitive Design</span>
+              <span className="px-6 py-2 rounded-full border border-white/10 bg-surface/50 text-orange-400 text-sm tracking-wide">AI-Powered Insights</span>
+              <span className="px-6 py-2 rounded-full border border-white/10 bg-surface/50 text-gold-400 text-sm tracking-wide">Seamless Collaboration</span>
+            </div>
+          </motion.div>
         </div>
       </section>
 
