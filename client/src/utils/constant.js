@@ -1,4 +1,7 @@
-export const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+export const API_BASE_URL =
+  window.location.hostname === "localhost"
+    ? "http://localhost:5000/api"
+    : "https://study-hub-bowa.onrender.com/api";
 
 export const ROLES = {
   ADMIN: "admin",
